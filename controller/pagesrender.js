@@ -4,7 +4,7 @@ const staffs = require("../models/staffs");
 const RenderPages = {
     async getHome(req, res) {
         try {
-            const doctors = await staffs.find({status: 'Active'})
+            const doctors = await staffs.find({status: new RegExp(`^Active$`, 'i')})
 
             console.log("Doctors", doctors)
             res.render('./Home/index', {doctors})

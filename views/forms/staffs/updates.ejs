@@ -6,7 +6,9 @@
         <div class="card-body">
             <form id="staffForm" class="needs-validation" novalidate action="/staff" method="post"
                 enctype="multipart/form-data">
+
                 <!-- Personal Information -->
+
                 <div class="col mb-4 p-0">
                     <h5>Personal Information</h5>
                     <hr>
@@ -16,7 +18,7 @@
                             <select class="form-control" id="title" name="title" required>
                                 <option value="">Select</option>
                                 <option value="Mr">Mr</option>
-                                <option value="Ms">Ms</option>
+                                <option value="Ms">Mrs</option>
                                 <option value="Prof">Prof</option>
                                 <option value="Dr">Dr</option>
                                 <option value="Miss">Miss</option>
@@ -113,7 +115,7 @@
                             <input type="tel" class="form-control" id="contact" name="contact" required>
                             <div class="invalid-feedback">Please enter your contact number.</div>
                         </div>
-                       
+
                     </div>
                 </div>
 
@@ -143,7 +145,8 @@
 
                 <div class="row">
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Update Staff</button>
+                        <button type="submit" class="btn btn-primary">Register Staff</button>
+                        <button type="reset" class="btn btn-secondary">Reset Form</button>
                     </div>
                 </div>
             </form>

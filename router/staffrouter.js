@@ -5,7 +5,10 @@ const upload = require('../config/multer_file_uploader');
 
 
 // Routes with file upload
-router.post('/staff', upload.single('profile'), StaffController.createStaff);
+router.post('/staff', upload.fields([
+    {name: 'profile', maxCount: 1}
+]), StaffController.createStaff);
+
 router.put('/staff/:id', upload.single('profile'), StaffController.updateStaff);
 router.put('/staff/:id/profile-image', upload.single('profile'), StaffController.updateProfileImage);
 
