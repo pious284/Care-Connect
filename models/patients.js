@@ -47,26 +47,28 @@ const PatientSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-    position: {
-      type: String,
-      enum: ["admin", "specialist", "midwife", "doctor", "nurse"],
-    },
     contact: {
       type: String,
     },
     profile: {
-      type: String,
-      default:
-        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-        trim: true,
-    },
+      picture: {
+         type: String,
+         default:
+           "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+           trim: true,
+       },
+       publicId:{
+         type: String
+       }
+     },
     password: {
       type: String,
       require: true,
     },
     status: {
       type: String,
-      enum: ["addmitted", "diacharged",]
+      enum: ["none","addmitted", "diacharged",],
+      default : 'none'
     },
     bill: {
       type: Number,

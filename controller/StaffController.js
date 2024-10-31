@@ -1,13 +1,9 @@
 const Staffs = require('../models/staffs');
 const bcrypt = require('bcrypt');
 const { validationResult } = require('express-validator');
-const cloudinary  = require('../config/cloudinaryConfig');
+const {cloudinary, cleanupUploadedFile}  = require('../config/cloudinaryConfig');
 
-async function  cleanupUploadedFile(req, fieldName) {
-  if (req.files && req.files[fieldName]) {
-    await cloudinary.uploader.destroy(req.files[fieldName][0].public_id);
-  }
-}
+
 
 const staffController = {
 

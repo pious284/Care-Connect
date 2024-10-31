@@ -55,11 +55,17 @@ const HospitalSchema = new mongoose.Schema({
         trim: true,
         require: true
     },
-    logo: {
-        type: String,
-        trim: true,
-        require: true
-    },
+    logo:{
+        picture: {
+           type: String,
+           default:
+             "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+             trim: true,
+         },
+         publicId:{
+           type: String
+         }
+       },
     reviews: [
         {
             type: mongoose.Schema.ObjectId,

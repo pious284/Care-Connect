@@ -25,6 +25,7 @@ const ejs = require('ejs');
 // const userRoutes = require('./router/route');
 const pagesRender = require('./router/pagesRender');
 const staffRouter = require('./router/staffrouter');
+const hospitalRouter = require('./router/hospitalrouter')
 
 // Error handlers
 const notFoundHandler = require('./handlers/404');
@@ -75,6 +76,7 @@ require('./database/dbConfig')();
 // app.use('/api', userRoutes);
 app.use('/',pagesRender);
 app.use(staffRouter)
+app.use(hospitalRouter)
 
 // Error handling middleware stack
 app.use(notFoundHandler);

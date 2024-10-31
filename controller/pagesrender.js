@@ -47,7 +47,25 @@ const RenderPages = {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
         }
-    }
+    },
+    async getRegisteration(req, res) {
+        try {
+         
+            res.render('./Home/registeration')
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
+    async getHospitalRegisteration(req, res) {
+        try {
+         
+            res.render('./Home/registerHospital')
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
 }
 
 module.exports = RenderPages;

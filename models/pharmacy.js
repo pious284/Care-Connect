@@ -2,23 +2,23 @@ const mongoose = require('mongoose');
 
 const Pharmacieschema = new mongoose.Schema({
     name: {
-        type:String,
+        type: String,
         trim: true,
         require: true,
         unique: true
     },
-    bio:{
+    bio: {
         type: String,
         trim: true
     },
-    contact:{
+    contact: {
         type: String,
         require: true,
         trim: true
     },
     email: {
         type: String,
-        trim:true,
+        trim: true,
         unique: true,
         require: true
     },
@@ -27,44 +27,50 @@ const Pharmacieschema = new mongoose.Schema({
         unique: true,
         trim: true
     },
-    dispenseraddress :{
+    dispenseraddress: {
         type: String,
         require: true
     },
-    wallet:{
-        number:{
-            type:String,
+    wallet: {
+        number: {
+            type: String,
             trim: true,
             require: true
         },
         name: {
-            type:String,
+            type: String,
             trim: true,
             require: true
         }
     },
 
-    ambulancecontact :{
+    ambulancecontact: {
         type: String,
         require: true,
         trim: true
     },
-    subscriptionstatus :{
+    subscriptionstatus: {
         type: String,
         enum: ['active', 'expired'],
         default: 'expired'
     },
-    address:{
+    address: {
         type: String,
         trim: true,
         require: true
     },
     logo: {
-        type: String,
-        trim: true,
-        require: true
+        picture: {
+            type: String,
+            default:
+                "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+            trim: true,
+        },
+        publicId: {
+            type: String
+        }
     },
-    staffs:[
+    staffs: [
         {
             type: mongoose.Schema.ObjectId,
             ref: 'Staffs'

@@ -7,6 +7,8 @@ router.get('/about',  RenderPages.getAbout)
 router.get('/doctors',  RenderPages.getDoctors)
 router.get('/contact',  RenderPages.getContacts)
 router.get('/login',  RenderPages.getLogin)
+router.get('/register',  RenderPages.getRegisteration)
+router.get('/register/hospital',  RenderPages.getHospitalRegisteration)
 
 
 module.exports = router

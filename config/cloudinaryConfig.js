@@ -6,4 +6,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET
 });
 
-module.exports = cloudinary;
+async function  cleanupUploadedFile(req, fieldName) {
+  if (req.files && req.files[fieldName]) {
+    await cloudinary.uploader.destroy(req.files[fieldName][0].public_id);
+  }
+} 
+module.exports = {cloudinary, cleanupUploadedFile};
