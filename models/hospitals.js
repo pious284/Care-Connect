@@ -65,6 +65,12 @@ const HospitalSchema = new mongoose.Schema({
            type: String
          }
        },
+    staffs:[
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Staffs'
+        }
+    ],
     reviews: [
         {
             type: mongoose.Schema.ObjectId,

@@ -1,48 +1,52 @@
+const Hospitals = require("../models/hospitals");
 const staffs = require("../models/staffs");
 
 
 const RenderPages = {
     async getHome(req, res) {
         try {
-            const doctors = await staffs.find({status: new RegExp(`^Active$`, 'i')})
-
+            const doctors = await staffs.find({ status: new RegExp(`^Active$`, 'i') })
+            const hospitals = await Hospitals.find().populate({ path: 'staffs', options: { sort: { position: -1 },  } })
             console.log("Doctors", doctors)
-            res.render('./Home/index', {doctors})
+            res.render('./Home/index', {
+                doctors,
+                hospitals
+            })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
         }
     },
-    async getAbout(req,res ){
+    async getAbout(req, res) {
         try {
-            const doctors = await staffs.find({status: 'Active'})
-            res.render('./Home/about', {doctors})
+            const doctors = await staffs.find({ status: 'Active' })
+            res.render('./Home/about', { doctors })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
         }
     },
-    async getDoctors(req,res ){
+    async getDoctors(req, res) {
         try {
-            const doctors = await staffs.find({status: 'Active'})
-            res.render('./Home/doctors', {doctors})
+            const doctors = await staffs.find({ status: 'Active' })
+            res.render('./Home/doctors', { doctors })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
         }
     },
-    async getContacts(req,res ){
+    async getContacts(req, res) {
         try {
-            const doctors = await staffs.find({status: 'Active'})
-            res.render('./Home/contact', {doctors})
+            const doctors = await staffs.find({ status: 'Active' })
+            res.render('./Home/contact', { doctors })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
         }
     },
-    async getLogin(req, res){
+    async getLogin(req, res) {
         try {
-            res.render('./Home/login', )
+            res.render('./Home/login',)
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
@@ -50,7 +54,7 @@ const RenderPages = {
     },
     async getRegisteration(req, res) {
         try {
-         
+
             res.render('./Home/registeration')
         } catch (error) {
             console.error(error.message);
@@ -59,7 +63,7 @@ const RenderPages = {
     },
     async getHospitalRegisteration(req, res) {
         try {
-         
+
             res.render('./Home/registerHospital')
         } catch (error) {
             console.error(error.message);
