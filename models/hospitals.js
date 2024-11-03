@@ -46,9 +46,8 @@ const HospitalSchema = new mongoose.Schema({
         trim: true
     },
     subscriptionstatus :{
-        type: String,
-        enum: ['active', 'expired'],
-        default: 'expired'
+        type: Boolean,
+        default: false
     },
     address:{
         type: String,

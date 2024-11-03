@@ -72,8 +72,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="wallet.name" class="form-label">Wallet Name</label>
-                                    <input type="text" class="form-control" id="wallet.name" name="walletname"
-                                        required>
+                                    <input type="text" class="form-control" id="wallet.name" name="walletname" required>
                                     <div class="invalid-feedback">Please enter wallet name.</div>
                                 </div>
                             </div>
@@ -97,20 +96,20 @@
                                 </div>
                             </div>
                         </div>
-                                        <!-- Password -->
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        <div class="invalid-feedback">Please enter a password.</div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="confirmPassword" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
-                            required>
-                        <div class="invalid-feedback">Please confirm your password.</div>
-                    </div>
-                </div>
+                        <!-- Password -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="invalid-feedback">Please enter a password.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                                    required>
+                                <div class="invalid-feedback">Please confirm your password.</div>
+                            </div>
+                        </div>
 
                         <div class="d-flex justify-content-between align-items-center">
                             <!-- <button type="reset" class="btn btn-secondary">Reset Form</button> -->
@@ -119,9 +118,11 @@
 
                         <div class="col justify-content-center align-items-center p-3 mt-4">
                             <p>Already have an account <a href="/login" class="text-decoration-none">Login?</a></p>
-                
-                            <p>Patientcare Providers Wanted: <a href="/register/hospital">Join Our Patient Network</a></p>
-                            <p>Pharmacists, Get Connected: <a href="/register/pharmacy">Register Your Pharmacy Today</a></p>
+
+                            <p>Patientcare Providers Wanted: <a href="/register/hospital">Join Our Patient Network</a>
+                            </p>
+                            <p>Pharmacists, Get Connected: <a href="/register/pharmacy">Register Your Pharmacy Today</a>
+                            </p>
                         </div>
                     </form>
                 </div>
@@ -139,20 +140,22 @@
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirmPassword');
 
-        
+
         form.addEventListener('submit', event => {
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
             }
-                        // Check if passwords match
-                        if (password.value !== confirmPassword.value) {
+            // Check if passwords match
+            if (password.value !== confirmPassword.value) {
                 event.preventDefault();
                 confirmPassword.setCustomValidity("Passwords don't match");
             } else {
                 confirmPassword.setCustomValidity('');
             }
             form.classList.add('was-validated');
+
+            
         }, false);
     })();
 </script>

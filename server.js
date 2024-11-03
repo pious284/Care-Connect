@@ -26,6 +26,7 @@ const ejs = require('ejs');
 const pagesRender = require('./router/pagesRender');
 const staffRouter = require('./router/staffrouter');
 const hospitalRouter = require('./router/hospitalrouter')
+const PwaRouter = require('./router/pwaRouter')
 
 // Error handlers
 const notFoundHandler = require('./handlers/404');
@@ -57,7 +58,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session(sessionConfig));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 // Performance monitoring middleware
 app.use((req, res, next) => {
@@ -77,6 +78,7 @@ require('./database/dbConfig')();
 app.use('/',pagesRender);
 app.use(staffRouter)
 app.use(hospitalRouter)
+app.use(PwaRouter)
 
 // Error handling middleware stack
 app.use(notFoundHandler);

@@ -13,6 +13,7 @@ const https = require('https');
  * @throws {Error} If the payment initialization fails or if there's an error parsing the response.
  */
 function initiatePaystackPayment(email, amount, metadata = {}) {
+
   return new Promise((resolve, reject) => {
     // Prepare the request parameters
     const params = JSON.stringify({
@@ -20,6 +21,7 @@ function initiatePaystackPayment(email, amount, metadata = {}) {
       amount: amount * 100, // Paystack expects amount in the smallest currency unit
       metadata: metadata
     });
+
 
     // Set up the options for the HTTPS request
     const options = {
@@ -59,6 +61,7 @@ function initiatePaystackPayment(email, amount, metadata = {}) {
 
     // Handle any errors that occur during the request
     req.on('error', error => {
+      console.log(error)
       reject(error);
     });
 

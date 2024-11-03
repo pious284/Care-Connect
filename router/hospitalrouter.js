@@ -4,7 +4,7 @@ const hospitalController = require('../controller/hospitalsControllers')
 const upload = require('../config/multer_file_uploader');
 
 
-router.post('/hospital', upload.fields([
+router.post('/hospital/register', upload.fields([
     {name: 'logo', maxCount: 1}
 ]), hospitalController.createHospital)
 
