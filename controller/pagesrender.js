@@ -6,8 +6,13 @@ const RenderPages = {
     async getHome(req, res) {
         try {
             const doctors = await staffs.find({ status: new RegExp(`^Active$`, 'i') })
-            const hospitals = await Hospitals.find().populate({ path: 'staffs', options: { sort: { position: -1 },  } })
-            console.log("Doctors", doctors)
+            const hospitals = await Hospitals.find().populate({
+                path: 'staffs',
+                match: { status: { $regex: '^Active$', $options: 'i' } },
+                options: {
+                    sort: { position: -1 },
+                }
+            })
             res.render('./Home/index', {
                 doctors,
                 hospitals

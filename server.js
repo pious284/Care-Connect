@@ -4,6 +4,7 @@ require('dotenv').config();
 // Core dependencies
 const express = require('express');
 const path = require('path');
+const flash = require('connect-flash');
 
 // Security and optimization middleware
 const compression = require('compression');
@@ -59,6 +60,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session(sessionConfig));
 app.use(express.static('public'));
+
+app.use(flash);
+// Global middleware for messages
+app.use((req, res, next) => {
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  res.locals.info = req.flash('info');
+  next();
+});
 
 // Performance monitoring middleware
 app.use((req, res, next) => {

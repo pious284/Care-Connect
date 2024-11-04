@@ -2,6 +2,10 @@ const Hospitals = require('../models/hospitals')
 const { cloudinary, cleanupUploadedFile } = require('../config/cloudinaryConfig');
 const bcrypt = require('bcrypt')
 const initiatePaystackPayment = require('../utils/payment');
+const Pharmacies = require('../models/pharmacy');
+const staffs = require('../models/staffs');
+const patients = require('../models/patients');
+const alert = require('../utils/alert');
 
 
 const hospitalController = {
@@ -68,7 +72,81 @@ const hospitalController = {
                 message: "An error occurred during registration. Please try again."
             });
         }
-    }
+    },
+    async login(req, res) {
+        try {
+            const { accountType, email, password } = req.body;
+
+            let account = null;
+            if (accountType === 'hospital') {
+                account = await Hospitals.find({ email });
+            } else if (accountType === 'pharmacy') {
+                account = await Pharmacies.find({ email });
+            } else if (accountType === 'staff') {
+                account = await staffs.find({ email })
+            } else {
+                account = await patients.find({ email });
+            }
+
+            if (!account) {
+                res.status(404).json({ message: "User account not found please try again " })
+            }
+
+            const isPasswordMatch = await bcrypt.compare(password, account.password);
+
+            if (!isPasswordMatch) {
+                res.status(400).json({ message: "Invalid User Name and password entered" })
+            }
+
+            // Set the user ID in the session
+            req.session.accountId = user;
+            req.session.isLoggedIn = true
+            alert.success(req,  `Welcome Back ${account.username}`)
+        } catch (error) {
+            res.status(500).json({ message: error.message, success: false })
+        }
+    },
+    async getAllHospital(req, res) {
+        try {
+            const Hospital = await Hospitals.find().populate('Staffs');
+
+            if (!Hospital) {
+                res.status(404).json({ message: "The is no records found", success: false })
+            }
+            res.status(200).json({ message: "Hospital data retrieved successfully", success: true })
+        } catch (error) {
+            res.status(500).json({ message: error.message, success: false })
+        }
+    },
+    async getHospitalById(req, res) {
+        try {
+            const { HospitalsId } = req.params;
+
+            const Hospital = await Hospitals.findById(HospitalsId).populate('Staffs');
+
+            if (!Hospital) {
+                res.status(404).json({ message: "The is no records found", success: false })
+            }
+            res.status(200).json({ message: "Hospital data retrieved successfully", success: true })
+        } catch (error) {
+            res.status(500).json({ message: error.message, success: false })
+        }
+    },
+    async deleteHospitalById(req, res) {
+        try {
+            const { HospitalsId } = req.params;
+
+            const Hospital = await Hospitals.findByIdAndDelete(HospitalsId);
+
+            if (!Hospital) {
+                res.status(404).json({ message: "The is no records found", success: false })
+            }
+            res.status(200).json({ message: "Hospital data deleted successfully", success: true })
+        } catch (error) {
+            res.status(500).json({ message: error.message, success: false })
+        }
+    },
+
 }
 
 module.exports = hospitalController;

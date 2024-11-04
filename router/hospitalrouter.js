@@ -8,5 +8,6 @@ router.post('/hospital/register', upload.fields([
     {name: 'logo', maxCount: 1}
 ]), hospitalController.createHospital)
 
+router.post('/login', hospitalController.login);
 
 module.exports = router

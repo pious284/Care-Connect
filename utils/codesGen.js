@@ -23,3 +23,27 @@ module.exports.capitalizeEachWord = function capitalizeEachWord(str) {
     const data = `${userId}-${randomBytes}-${timestamp}`;
     return crypto.createHash('sha256').update(data).digest('hex');
   }
+
+  const groupDataBy = (data, groupBy) => {
+    // Handle invalid inputs
+    if (!Array.isArray(data) || !groupBy) {
+      throw new Error('Invalid input: data must be an array and groupBy must be specified');
+    }
+  
+    // Group the data
+    const grouped = data.reduce((groups, item) => {
+      const key = item[groupBy];
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(item);
+      return groups;
+    }, {});
+  
+    // Convert to array format
+    return Object.entries(grouped).map(([key, items]) => ({
+      [groupBy]: key,
+      items
+    }));
+  };
+  module.exports = { groupDataBy}

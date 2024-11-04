@@ -15,7 +15,7 @@
             <% if (hospitals) { %>
                 <% hospitals.forEach(hospital => { %>
                   <div class="col g-3 align-content-lg-start">
-                    <h1 class="mb-5 wow fadeInUp"><%= hospital.name %></h1>
+                    <h2 class="mb-5 wow fadeInUp"><%= hospital.name %></h2>
                     <div class="owl-carousel wow fadeInUp" id="doctorSlideshow">
                       <% if (hospital.staffs ) { %>
                         <% hospital.staffs.forEach(doctor=> { %>
