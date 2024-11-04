@@ -47,9 +47,6 @@ const sessionConfig = {
   })
 };
 
-// View engine setup
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
 
 // Essential middleware stack
 app.use(compression());
@@ -59,17 +56,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session(sessionConfig));
-app.use(express.static('public'));
 
-app.use(flash);
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+// View engine setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+
+
 // Global middleware for messages
-app.use((req, res, next) => {
-  res.locals.success = req.flash('success');
-  res.locals.error = req.flash('error');
-  res.locals.info = req.flash('info');
-  next();
-});
+app.use(flash());
 
+app.use((req, res, next) => {
+    res.locals.message = req.flash('alert');
+    next();
+});
 // Performance monitoring middleware
 app.use((req, res, next) => {
   const start = Date.now();
@@ -88,7 +91,7 @@ require('./database/dbConfig')();
 app.use('/',pagesRender);
 app.use(staffRouter)
 app.use(hospitalRouter)
-app.use(PwaRouter)
+// app.use(PwaRouter)
 
 // Error handling middleware stack
 app.use(notFoundHandler);
@@ -99,7 +102,7 @@ app.use(errorHandler);
 async function startServer() {
   const PORT = process.env.PORT || 8080;
   try {
-    server = app.listen(PORT, () => {
+    server = app.listen(PORT,() => {
       console.log(`----Server running on http://localhost:${PORT} ----`);
     });
   } catch (err) {
