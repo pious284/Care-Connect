@@ -54,6 +54,11 @@ const HospitalSchema = new mongoose.Schema({
         trim: true,
         require: true
     },
+    password:{
+        type: String,
+        trim: true,
+        require: true
+    },
     logo:{
         picture: {
            type: String,

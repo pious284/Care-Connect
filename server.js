@@ -73,6 +73,7 @@ app.use((req, res, next) => {
     res.locals.message = req.flash('alert');
     next();
 });
+
 // Performance monitoring middleware
 app.use((req, res, next) => {
   const start = Date.now();
@@ -102,7 +103,7 @@ app.use(errorHandler);
 async function startServer() {
   const PORT = process.env.PORT || 8080;
   try {
-    server = app.listen(PORT,() => {
+    server = app.listen(PORT,'192.168.43.198',() => {
       console.log(`----Server running on http://localhost:${PORT} ----`);
     });
   } catch (err) {

@@ -1,9 +1,16 @@
 const Hospitals = require("../models/hospitals");
+const patients = require("../models/patients");
+const Pharmacies = require("../models/pharmacy");
 const staffs = require("../models/staffs");
 
 
 const RenderPages = {
     async getHome(req, res) {
+        const alertMessage = req.flash("message");
+        const alertStatus = req.flash("status");
+
+        const alert = { message: alertMessage, status: alertStatus };
+
         try {
             const doctors = await staffs.find({ status: new RegExp(`^Active$`, 'i') })
             const hospitals = await Hospitals.find().populate({
@@ -15,7 +22,8 @@ const RenderPages = {
             })
             res.render('./Home/index', {
                 doctors,
-                hospitals
+                hospitals,
+                alert
             })
         } catch (error) {
             console.error(error.message);
@@ -51,7 +59,14 @@ const RenderPages = {
     },
     async getLogin(req, res) {
         try {
-            res.render('./Home/login',)
+            const alertMessage = req.flash("message");
+            const alertStatus = req.flash("status");
+
+            const alert = { message: alertMessage, status: alertStatus };
+
+            console.log(alert);
+
+            res.render('./Home/login', { alert })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
@@ -70,6 +85,32 @@ const RenderPages = {
         try {
 
             res.render('./Home/registerHospital')
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
+    async getDashboard(req, res) {
+        try {
+            const { Id } = req.params;
+
+            let account = null;
+            if (Id) {
+                account = await Hospitals.findById(Id)
+                    .populate('staffs')
+                if (!account) {
+                    account = await Pharmacies.findById(Id)
+                        .populate('staffs')
+                    if (!account) {
+                        account = await staffs.findById(Id)
+                        if (!account) {
+                            account = await patients.findById(Id)
+
+                        }
+                    }
+                }
+            }
+            res.render('./Dashboard/dashboard', { account, })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });

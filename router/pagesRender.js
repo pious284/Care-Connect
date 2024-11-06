@@ -10,6 +10,9 @@ router.get('/login',  RenderPages.getLogin)
 router.get('/register',  RenderPages.getRegisteration)
 router.get('/register/hospital',  RenderPages.getHospitalRegisteration)
 
+// dashboard pages
+router.get('/dashboard/:Id',  RenderPages.getDashboard)
+
 
 module.exports = router
 

@@ -79,31 +79,57 @@ const hospitalController = {
 
             let account = null;
             if (accountType === 'hospital') {
-                account = await Hospitals.find({ email });
+                account = await Hospitals.findOne({ email });
             } else if (accountType === 'pharmacy') {
-                account = await Pharmacies.find({ email });
+                account = await Pharmacies.findOne({ email });
             } else if (accountType === 'staff') {
-                account = await staffs.find({ email })
+                account = await staffs.findOne({ email });
             } else {
-                account = await patients.find({ email });
+                account = await patients.findOne({ email });
             }
 
             if (!account) {
-                res.status(404).json({ message: "User account not found please try again " })
+                req.flash('message', 'Account not found. Please check your email.');
+                req.flash('status', 'danger');
+                return res.redirect('/login');
             }
 
-            const isPasswordMatch = await bcrypt.compare(password, account.password);
-
-            if (!isPasswordMatch) {
-                res.status(400).json({ message: "Invalid User Name and password entered" })
+            if (!account.password) {
+                req.flash('message', 'Invalid account data. Please check your email and  password.');
+                req.flash('status', 'danger');
+                return res.redirect('/login');
             }
 
-            // Set the user ID in the session
-            req.session.accountId = user;
-            req.session.isLoggedIn = true
-            alert.success(req,  `Welcome Back ${account.username}`)
+            const isMatch = await bcrypt.compare(password, account.password);
+
+            if (!isMatch) {
+                req.flash('message', 'Incorrect password entered. Please check your password.');
+                req.flash('status', 'danger');
+                return res.redirect('/login');
+            }
+
+            req.session.accountId = account._id;
+            req.session.accountType = accountType;
+            req.session.isLoggedIn = true;
+
+            req.flash('message', `Welcome back ${account.username || account.name || 'User'}!`);
+            req.flash('status', 'success');
+
+
+            const redirectMap = {
+                'hospital': `/dashboard/${account._id}`,
+                'pharmacy': `/dashboard/${account._id}`,
+                'staff': `/dashboard/${account._id}`,
+                'patient': `/dashboard/${account._id}`
+            };
+
+            return res.redirect(redirectMap[accountType]);
+
         } catch (error) {
-            res.status(500).json({ message: error.message, success: false })
+            console.error('Login error:', error);
+            req.flash('message', 'An error occurred during login. Please check your email.');
+            req.flash('status', 'danger');
+            return res.redirect('/login');
         }
     },
     async getAllHospital(req, res) {
