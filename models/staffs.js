@@ -41,7 +41,7 @@ const StaffsSchema = new mongoose.Schema(
       require: true,
       unique: true,
     },
-    maritalstatuse: {
+    maritalstatus: {
       type: String,
       trim: true,
       require: true,

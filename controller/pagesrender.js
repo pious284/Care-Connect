@@ -129,6 +129,32 @@ const RenderPages = {
             res.status(500).json({ success: false, message: error.message });
         }
     },
+    async getFacilityStaffs(req, res) {
+        try {
+            const alertMessage = req.flash("message");
+            const alertStatus = req.flash("status");
+
+            const alert = { message: alertMessage, status: alertStatus };
+
+            const { Id, accountType } = req.params;
+
+            let account = null;
+            if (Id) {
+                account = await Hospitals.findById(Id)
+                    .populate('staffs')
+                if (!account) {
+                    account = await Pharmacies.findById(Id)
+                        .populate('staffs')
+                }
+            }
+            const facilitystaffs = account.staffs;
+            // console.log(facilitystaffs)
+            res.render('./Dashboard/staffs', {account ,staffs:facilitystaffs, accountType, alert})
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
 }
 
 module.exports = RenderPages;
