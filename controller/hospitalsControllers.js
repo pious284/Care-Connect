@@ -117,10 +117,10 @@ const hospitalController = {
 
 
             const redirectMap = {
-                'hospital': `/dashboard/${account._id}`,
-                'pharmacy': `/dashboard/${account._id}`,
-                'staff': `/dashboard/${account._id}`,
-                'patient': `/dashboard/${account._id}`
+                'hospital': `/dashboard/${accountType}/${account._id}`,
+                'pharmacy': `/dashboard/${accountType}/${account._id}`,
+                'staff': `/dashboard/${accountType}/${account._id}`,
+                'patient': `/dashboard/${accountType}/${account._id}`
             };
 
             return res.redirect(redirectMap[accountType]);

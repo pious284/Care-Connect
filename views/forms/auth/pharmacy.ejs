@@ -1,142 +1,145 @@
-<div class="container d-flex align-items-center justify-content-center vh-100">
-    <div class="card shadow" style="width: 450px;">
-        <div class="card-header bg-primary text-white text-center">
-            <h3 class="mb-0">Care Connect</h3>
-            <p class="mt-2">Welcome Back!</p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h2 class="mb-0">Care Connect</h2>
+                    <p class="lead mb-0">Pharmacies Registration</p>
+                </div>
+                <div class="card-body p-4">
+                    <form id="pharmacyForm" class="needs-validation" novalidate action="/pharmacy/register" method="post"
+                        enctype="multipart/form-data">
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Pharmacy Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <div class="invalid-feedback">Please enter pharmacy name.</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" required>
+                                    <div class="invalid-feedback">Please enter a username.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">Contact Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <div class="input-group">
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="contact" class="form-label">Contact Number</label>
+                                    <div class="input-group">
+                                        <input type="tel" class="form-control" id="contact" name="contact" required>
+                                        <div class="invalid-feedback">Please enter contact number.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="ambulancecontact" class="form-label">Ambulance Contact</label>
+                                    <div class="input-group">
+                                        <input type="tel" class="form-control" id="ambulancecontact"
+                                            name="ambulancecontact" required>
+                                        <div class="invalid-feedback">Please enter ambulance contact number.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="address" name="address" required>
+                                    <div class="invalid-feedback">Please enter address.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wallet Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">Wallet Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="wallet.number" class="form-label">Wallet Number</label>
+                                    <input type="text" class="form-control" id="wallet.number" name="walletnumber"
+                                        required>
+                                    <div class="invalid-feedback">Please enter wallet number.</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="wallet.name" class="form-label">Wallet Name</label>
+                                    <input type="text" class="form-control" id="wallet.name" name="walletname" required>
+                                    <div class="invalid-feedback">Please enter wallet name.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">Additional Information</h5>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="bio" class="form-label">Pharmacy Bio</label>
+                                    <textarea class="form-control" id="bio" name="bio" rows="4"
+                                        placeholder="Tell us about your pharmacy"></textarea>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label for="logo" class="form-label">Pharmacy Logo</label>
+                                    <input type="file" class="form-control" id="logo" name="logo" accept="image/*"
+                                        required>
+                                    <div class="form-text">Upload your pharmacy logo (max 5MB)</div>
+                                    <div class="invalid-feedback">Please select a logo.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Password -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="invalid-feedback">Please enter a password.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                                    required>
+                                <div class="invalid-feedback">Please confirm your password.</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
+                              <label class="form-check-label" for="invalidCheck">
+                                Agree to terms and conditions
+                              </label>
+                              <div class="invalid-feedback">
+                                You must agree before submitting.
+                              </div>
+                            </div>
+                          </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- <button type="reset" class="btn btn-secondary">Reset Form</button> -->
+                            <button type="submit" class="btn btn-primary w-100">Register Pharmacy</button>
+                        </div>
+
+                        <div class="col justify-content-center align-items-center p-3 mt-4">
+                            <p>Already have an account <a href="/login" class="text-decoration-none">Login?</a></p>
+
+                            <p>Patientcare Providers Wanted: <a href="/register/hospital">Join Our Patient Network</a>
+                            </p>
+                    <p>Healthcare Providers Wanted: <a href="/register/hospital">Join Our Hospital Network</a></p>
+
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <form id="patientForm" class="needs-validation" novalidate action="/patient" method="post" enctype="multipart/form-data">
-            <!-- Personal Information -->
-            <div class="col mb-4 p-0">
-                <h5>Personal Information</h5>
-                <hr>
-                <div class="row mb-4">
-                    <div class="col-md-4 mb-3">
-                        <label for="firstname" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstname" name="firstname" required>
-                        <div class="invalid-feedback">Please enter first name.</div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="middlename" class="form-label">Middle Name</label>
-                        <input type="text" class="form-control" id="middlename" name="middlename">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="lastname" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastname" name="lastname" required>
-                        <div class="invalid-feedback">Please enter last name.</div>
-                    </div>
-                </div>
-        
-                <div class="row mb-4">
-                    <div class="col-md-4 mb-3">
-                        <label for="gender" class="form-label">Gender</label>
-                        <select class="form-control" id="gender" name="gender" required>
-                            <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="others">Others</option>
-                        </select>
-                        <div class="invalid-feedback">Please select gender.</div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="dob" class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control" id="dob" name="dob" required>
-                        <div class="invalid-feedback">Please enter date of birth.</div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="maritalstatuse" class="form-label">Marital Status</label>
-                        <input type="text" class="form-control" id="maritalstatuse" name="maritalstatuse" required>
-                        <div class="invalid-feedback">Please enter marital status.</div>
-                    </div>
-                </div>
-            </div>
-        
-            <!-- Professional Information -->
-            <div class="col mb-4 p-0">
-                <h5>Professional Information</h5>
-                <hr>
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label for="occupation" class="form-label">Occupation</label>
-                        <input type="text" class="form-control" id="occupation" name="occupation" required>
-                        <div class="invalid-feedback">Please enter occupation.</div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="staffId" class="form-label">Staff ID</label>
-                        <input type="text" class="form-control" id="staffId" name="staffId">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="position" class="form-label">Position</label>
-                        <select class="form-control" id="position" name="position">
-                            <option value="">Select Position</option>
-                            <option value="admin">Admin</option>
-                            <option value="specialist">Specialist</option>
-                            <option value="midwife">Midwife</option>
-                            <option value="doctor">Doctor</option>
-                            <option value="nurse">Nurse</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        
-            <!-- Contact Information -->
-            <div class="col mb-4 p-0">
-                <h5>Contact Information</h5>
-                <hr>
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                        <div class="invalid-feedback">Please enter a valid email address.</div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="contact" class="form-label">Contact Number</label>
-                        <input type="tel" class="form-control" id="contact" name="contact">
-                    </div>
-                </div>
-            </div>
-        
-            <!-- Additional Information -->
-            <div class="row mb-4">
-                <div class="col-md-6 mb-3">
-                    <label for="profile" class="form-label">Profile Picture</label>
-                    <input type="file" class="form-control" id="profile" name="profile" accept="image/*">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-control" id="status" name="status">
-                        <option value="">Select Status</option>
-                        <option value="addmitted">Admitted</option>
-                        <option value="discharged">Discharged</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="bill" class="form-label">Bill Amount</label>
-                    <input type="number" class="form-control" id="bill" name="bill" min="0" required>
-                    <div class="invalid-feedback">Please enter bill amount.</div>
-                </div>
-            </div>
-        
-            <!-- Password -->
-            <div class="row mb-4">
-                <div class="col-md-6 mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                    <div class="invalid-feedback">Please enter password.</div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="confirmPassword" class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                    <div class="invalid-feedback">Please confirm password.</div>
-                </div>
-            </div>
-        
-            <div class="row">
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Register Patient</button>
-                    <button type="reset" class="btn btn-secondary">Reset Form</button>
-                </div>
-            </div>
-        </form>
     </div>
 </div>
 
@@ -145,15 +148,26 @@
     // Form validation
     (() => {
         'use strict';
-        const form = document.getElementById('patientForm');
+        const form = document.getElementById('pharmacyForm');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+
 
         form.addEventListener('submit', event => {
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
             }
-
+            // Check if passwords match
+            if (password.value !== confirmPassword.value) {
+                event.preventDefault();
+                confirmPassword.setCustomValidity("Passwords don't match");
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
             form.classList.add('was-validated');
+
+            
         }, false);
     })();
 </script>

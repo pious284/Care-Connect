@@ -12,16 +12,15 @@ const RenderPages = {
         const alert = { message: alertMessage, status: alertStatus };
 
         try {
-            const doctors = await staffs.find({ status: new RegExp(`^Active$`, 'i') })
-            const hospitals = await Hospitals.find().populate({
+            const hospitals = await Hospitals.find({subscriptionstatus: true}).populate({
                 path: 'staffs',
                 match: { status: { $regex: '^Active$', $options: 'i' } },
                 options: {
                     sort: { position: -1 },
                 }
             })
+
             res.render('./Home/index', {
-                doctors,
                 hospitals,
                 alert
             })
@@ -90,9 +89,23 @@ const RenderPages = {
             res.status(500).json({ success: false, message: error.message });
         }
     },
+    async getPharmacyRegisteration(req, res) {
+        try {
+
+            res.render('./Home/registerPharmacy')
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
     async getDashboard(req, res) {
         try {
-            const { Id } = req.params;
+            const alertMessage = req.flash("message");
+            const alertStatus = req.flash("status");
+
+            const alert = { message: alertMessage, status: alertStatus };
+
+            const { Id, accountType } = req.params;
 
             let account = null;
             if (Id) {
@@ -110,7 +123,7 @@ const RenderPages = {
                     }
                 }
             }
-            res.render('./Dashboard/dashboard', { account, })
+            res.render('./Dashboard/dashboard', { account, accountType, alert})
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });

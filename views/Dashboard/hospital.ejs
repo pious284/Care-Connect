@@ -1,0 +1,116 @@
+<div class="col ">
+    <div class="welcome mb-4">
+        <h4 class="text-primary font-monospace">My Dashboard</h4>
+        <p class="small">A brief summary of facility account </p>
+    </div>
+    <div class="hospitalcards">
+        <div class="hospitalcard rounded-lg shadow-md">
+            <div class="card-item rounded-lg shadow-sm p-4">
+                <div class="card-title">
+                    <h4 class="text-success">
+                        Staffs
+                    </h4>
+                </div>
+                <div class="card-value-wrapper">
+                    <div
+                        class="card-value rounded- border-4 border-yellow-400 w-12 h-12 flex items-center justify-center text-lg font-medium">
+                        <%= account.staffs.length %>
+                    </div>
+                </div>
+            </div>
+            <div class="card-item rounded-lg shadow-sm p-4">
+                <div class="card-title ">
+                    <h4 class="text-warning">
+                        Appointments
+                    </h4>
+                </div>
+                <div class="card-value-wrapper">
+                    <div
+                        class="card-value rounded-5 border-2 border-success w-12 h-12 flex items-center justify-center text-lg font-medium">
+                        30
+                    </div>
+                </div>
+            </div>
+            <div class="card-item rounded-lg shadow-sm p-4">
+                <div class="card-title">
+                    <h4 class="text-danger">
+                        Reviews
+                    </h4>
+                </div>
+                <div class="card-value-wrapper">
+                    <div
+                        class="card-value rounded-full border-4 border-yellow-400 w-12 h-12 flex items-center justify-center text-lg font-medium">
+                        30
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class=" megacard card rounded-lg shadow-md p-4">
+            <canvas id="hospitalMetricsChart" class="h-full"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // In your JavaScript file
+    const ctx = document.getElementById('hospitalMetricsChart').getContext('2d');
+    const StaffsLength = <%= account.staffs.length %> || 0;
+    const Reviewslength = <%= account.reviews.length %> || 0;
+    const Appointmentslength = <%= account.staffs.length %> || 0;
+   
+    const data = [
+        { metric: 'Appointments', value: Appointmentslength },
+        { metric: 'Reviews', value: Reviewslength },
+        { metric: 'Staffs', value: StaffsLength }
+    ]
+
+    new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.map(item => item.metric),
+      datasets: [
+        {
+          label: 'Appointments',
+          data: [data[0].value],
+          backgroundColor: '#4299e1', // Blue
+          borderColor: '#4299e1',
+          borderWidth: 1,
+          
+        },
+        {
+          label: 'Reviews',
+          data: [data[1].value],
+          backgroundColor: '#48bb78', // Green
+          borderColor: '#48bb78',
+          borderWidth: 1
+        },
+        {
+          label: 'Staffs',
+          data: [data[2].value],
+          backgroundColor: '#e6c65b', // Yellow
+          borderColor: '#e6c65b',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Summary Metrics'
+        },
+        legend: {
+          display: true,
+          position: 'bottom'
+        }
+      }
+    }
+  });
+</script>

@@ -34,7 +34,7 @@ const purchaseController = {
         if (facility) {
           return res.status(404).send('Unable to find ficility ');
         }
-        facility.subscriptionstatus = 'active'
+        facility.subscriptionstatus = true
 
         facility.save();
 

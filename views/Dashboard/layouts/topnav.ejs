@@ -5,12 +5,21 @@
             <i class='bx bx-menu'></i>
         </div>
         <div class=" facilitylogo">
-            <img src="/icons/icon-92x92.png" alt=""  >
-            <h4>Tamale Teaching Hospital</h4>
+            <% if (accountType && accountType === 'hospital' || accountType === 'pharmacy') { %>
+                <img src="<%= account.logo.picture %>" alt="<%= account.name %>"  >
+            <h4 class="text-truncate text-uppercase"><%= account.name %> </h4>
+           
+            <% } else { %>
+                <img src="/icons/icon-92x92.png" alt=""  >
+                <h4>Care Connect</h4>
+            <% }%>
+             
         </div>
      </div>
     
     <div>
-        <i class='bx bx-signin'>Signout</i>
+        <i class='bx bx-signin'>
+            <a href="/logout">Signout</a>
+        </i>
     </div>
 </div>

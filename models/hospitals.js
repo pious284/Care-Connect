@@ -81,7 +81,11 @@ const HospitalSchema = new mongoose.Schema({
             type: mongoose.Schema.ObjectId,
             ref: "Reviews"
         }
-    ]
+    ],
+    isOwner:{
+        type: Boolean,
+        default: false
+    }
 
 });
 

@@ -9,19 +9,41 @@
       <span class="logo-text"><span class="text-primary">Care</span>-Connect</span>
   </div>
   <ul class="nav-links">
-      <li class="nav-item">
-          <a href="/dashboard" class="nav-link">
-              <i class='bx bx-grid-alt'></i>
-              <span class="link-text">Dashboard</span>
-          </a>
-
-      </li>
-      <li class="nav-item">
-          <a href="/manager/cattles" class="nav-link">
-              <i class="fas fa-cow"></i>
-              <span class="link-text">Cattle</span>
-          </a>
-      </li>
+    <li class="nav-item">
+        <a href="/dashboard" class="nav-link">
+            <i class='bx bx-grid-alt'></i>
+            <span class="link-text">Dashboard</span>
+        </a>
+    </li>
+    <% if (accountType === 'hospital') { %>
+        <li class="nav-item">
+            <a href="/dashboard/<%= accountType %>/<%= account._id %>/staffs" class="nav-link">
+              <i class='bx bx-user'></i>
+                <span class="link-text">Staffs</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/dashboard/<%= accountType %>/<%= account._id %>/appointments" class="nav-link">
+                <i class='bx bx-calendar' ></i>
+                <span class="link-text">Appointments</span>
+            </a>
+        </li>
+    <% } %>
+    <% if (account.isOwner) { %>
+        <li class="nav-item">
+            <a href="/dashboard/<%= accountType %>/<%= account._id %>/hospitals" class="nav-link">
+                <i class='bx bx-clinic'></i>
+                <span class="link-text">Hospitals</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/dashboard/<%= accountType %>/<%= account._id %>/pharmacies" class="nav-link">
+                <i class='bx bx-plus-medical'></i>
+                <span class="link-text">Pharmacies</span>
+            </a>
+        </li>
+    <% } %>
+ 
       <!-- Add more nav items as needed -->
   </ul>
 </nav>

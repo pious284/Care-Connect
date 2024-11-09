@@ -18,7 +18,7 @@
 
   body {
     min-height: 100vh;
-    background: #f4f7fa;
+    background: #ffffff;
   }
 
   .layout-wrapper {
@@ -98,38 +98,66 @@
   .nav-item {
     list-style: none;
     position: relative;
-  }
+}
 
-  .nav-link {
+.nav-link {
     display: flex;
     align-items: center;
     padding: 12px 15px;
     color: #333;
     text-decoration: none;
     transition: background 0.3s ease;
-  }
+}
 
-  .nav-link:hover {
+.nav-link:hover {
     background: var(--primary-color-light);
-  }
+}
 
-  .nav-link i {
+.nav-link i {
     min-width: 40px;
     font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
+}
 
-  .link-text {
-    transition: opacity 0.3s ease;
+.link-text {
+    transition: opacity 0.3s ease, width 0.3s ease;
     white-space: nowrap;
-  }
+}
 
-  .sidebar.collapsed .link-text {
+.sidebar.collapsed .link-text {
     opacity: 0;
     width: 0;
-  }
+}
+
+.nav-item .sub-menu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 200px;
+    background: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.nav-item:hover .sub-menu {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sidebar.collapsed .nav-item .sub-menu {
+    display: none;
+}
+
+.sidebar.collapsed .nav-item:hover .sub-menu {
+    display: block;
+}
 
   /* Main Content Styles */
   .main-content {
@@ -174,6 +202,33 @@
     padding: 20px;
   }
 
+    .hospitalcards {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    
+    .hospitalcard {
+      display: flex;
+      flex-direction: column;
+      width: 35%;
+      gap: 1rem;
+    }
+    
+    .hospitalcard .card-item {
+      height: 9rem;
+    }
+    
+    .hospitalcard .card-item:hover {
+      transform: translateY(-5px);
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .megacard {
+      width: calc(65% - 1rem);
+      flex-grow: 1;
+    }
   /* Mobile Styles */
   @media (max-width: 768px) {
     .sidebar {
@@ -225,5 +280,20 @@
     }
     .facilitylogo h4{
       font-size: 12px;
+    }
+    .hospitalcards {
+      flex-wrap: wrap;
+    }
+  
+    .hospitalcard {
+      width: 100%;
+    }
+  
+    .megacard {
+      /* overflow-x: scroll; */
+      width: 50%;
+    }
+    .hospitalMetricsChart{
+      width: 80%;
     }
   }
