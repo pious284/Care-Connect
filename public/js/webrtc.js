@@ -26,8 +26,11 @@ async function setupMediaStream() {
         const userId = generateUserId();
         socket.emit('join-room', ROOM_ID, userId);
 
+       
+        
         socket.on('user-connected', (userId) => {
             connectToNewUser(userId, localStream);
+            updateParticipantCount();
         });
 
         socket.on('user-disconnected', (userId) => {
@@ -38,9 +41,9 @@ async function setupMediaStream() {
 
         socket.on('existing-users', (users) => {
             users.forEach((userId) => connectToNewUser(userId, localStream));
-            updateParticipantCount(users.length + 1); // Update with initial count
+            updateParticipantCount(users.length + 1); // +1 for current user
         });
-
+        
         socket.on('user-signal', async ({ userId, signal }) => {
             handleUserSignal(userId, signal);
         });

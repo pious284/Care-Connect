@@ -46,27 +46,28 @@ const io = require('socket.io')(server);
 // Socket.io connection handling
 const rooms = {};
 
-io.on('connection', socket => {
+io.on('connection', (socket) => {
   socket.on('join-room', (roomId, userId) => {
       socket.join(roomId);
+
+      // Get all connected clients in the room (except the new user)
+      const existingUsers = [...io.sockets.adapter.rooms.get(roomId) || []].filter(id => id !== socket.id);
+
+      // Send existing users to the newly joined user
+      socket.emit('existing-users', existingUsers);
+
+      // Notify others in the room about the new user
       socket.to(roomId).emit('user-connected', userId);
 
-      if (!rooms[roomId]) {
-          rooms[roomId] = new Set();
-      }
-      rooms[roomId].add(userId);
-      
-      // Send list of existing users to the newly joined user
-      socket.emit('existing-users', Array.from(rooms[roomId]));
-
+      // Handle user disconnect
       socket.on('disconnect', () => {
-          rooms[roomId].delete(userId);
           socket.to(roomId).emit('user-disconnected', userId);
       });
 
-      // Handle signaling
-      socket.on('signal', ({ userId, signal }) => {
-          socket.to(roomId).emit('user-signal', { userId, signal });
+      // Handle signaling data
+      socket.on('signal', (data) => {
+          const targetSocket = io.sockets.sockets.get(data.userId);
+          if (targetSocket) targetSocket.emit('user-signal', { userId: socket.id, signal: data.signal });
       });
   });
 });
