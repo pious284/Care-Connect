@@ -6,6 +6,8 @@ const Pharmacies = require('../models/pharmacy');
 const staffs = require('../models/staffs');
 const patients = require('../models/patients');
 const alert = require('../utils/alert');
+const { generateFacilityWelcomeMessage } = require('../utils/messages');
+const { sendEmail } = require('../utils/MailSender');
 
 
 const hospitalController = {
@@ -58,12 +60,14 @@ const hospitalController = {
             // Save the hospital
             await newHospital.save();
 
-            // Return success response with payment details
-            return res.status(201).json({
-                success: true,
-                message: "Hospital account registered successfully. Please complete subscription to continue",
-                paymentDetails: initializePayment
-            });
+            const message = generateFacilityWelcomeMessage(newHospital,initializePayment )
+
+            await sendEmail(email, 'Facility account registeration', message )
+            req.flash('message', `${newHospital.name}! account has been created successfully. please check email to complete subscription'`);
+            req.flash('status', 'success');
+
+            res.redirect('/login')
+
 
         } catch (error) {
             console.error('Hospital registration error:', error);

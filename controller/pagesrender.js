@@ -19,7 +19,6 @@ const RenderPages = {
                     sort: { position: -1 },
                 }
             })
-
             res.render('./Home/index', {
                 hospitals,
                 alert
@@ -63,7 +62,6 @@ const RenderPages = {
 
             const alert = { message: alertMessage, status: alertStatus };
 
-            console.log(alert);
 
             res.render('./Home/login', { alert })
         } catch (error) {
@@ -141,10 +139,20 @@ const RenderPages = {
             let account = null;
             if (Id) {
                 account = await Hospitals.findById(Id)
-                    .populate('staffs')
+                    .populate({
+                        path: 'staffs',
+                        options: {
+                            sort: { _id: -1 },
+                        }
+                    })
                 if (!account) {
                     account = await Pharmacies.findById(Id)
-                        .populate('staffs')
+                        .populate({
+                            path: 'staffs',
+                            options: {
+                                sort: { _id: -1 },
+                            }
+                        })
                 }
             }
             const facilitystaffs = account.staffs;

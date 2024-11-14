@@ -17,6 +17,11 @@ const AppointmentSchema = new mongoose.Schema({
         require: true,
         trim: true
     },
+    time:{
+        type: String,
+        require: true,
+        trim: true
+    },
     field:{
         type: String,
         require: true,
@@ -27,9 +32,9 @@ const AppointmentSchema = new mongoose.Schema({
         require: true,
         trim: true
     },
-    staff:{
-        type: mongoose.Schema.ObjectId,
-        ref: 'staffs'
+    isAttended:{
+        type: Boolean,
+        default: false
     },
     facility:{
         type: mongoose.Schema.ObjectId,

@@ -28,6 +28,7 @@ const pagesRender = require('./router/pagesRender');
 const staffRouter = require('./router/staffrouter');
 const hospitalRouter = require('./router/hospitalrouter')
 const PwaRouter = require('./router/pwaRouter')
+const AppointmentRouter = require('./router/appointment')
 
 // Error handlers
 const notFoundHandler = require('./handlers/404');
@@ -35,7 +36,40 @@ const { validationErrorHandler, errorHandler } = require('./handlers/400');
 
 // Initialize express app
 const app = express();
-let server;
+
+// Initialize socket Server  
+
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+
+
+// Socket.io connection handling
+const rooms = {};
+
+io.on('connection', socket => {
+  socket.on('join-room', (roomId, userId) => {
+      socket.join(roomId);
+      socket.to(roomId).emit('user-connected', userId);
+
+      if (!rooms[roomId]) {
+          rooms[roomId] = new Set();
+      }
+      rooms[roomId].add(userId);
+      
+      // Send list of existing users to the newly joined user
+      socket.emit('existing-users', Array.from(rooms[roomId]));
+
+      socket.on('disconnect', () => {
+          rooms[roomId].delete(userId);
+          socket.to(roomId).emit('user-disconnected', userId);
+      });
+
+      // Handle signaling
+      socket.on('signal', ({ userId, signal }) => {
+          socket.to(roomId).emit('user-signal', { userId, signal });
+      });
+  });
+});
 
 // Session configuration
 const sessionConfig = {
@@ -88,11 +122,10 @@ app.use((req, res, next) => {
 require('./database/dbConfig')();
 
 // Routes
-// app.use('/api', userRoutes);
 app.use('/',pagesRender);
 app.use(staffRouter)
 app.use(hospitalRouter)
-// app.use(PwaRouter)
+app.use(AppointmentRouter)
 
 // Error handling middleware stack
 app.use(notFoundHandler);
@@ -103,7 +136,7 @@ app.use(errorHandler);
 async function startServer() {
   const PORT = process.env.PORT || 8080;
   try {
-    server = app.listen(PORT,() => {
+    app.listen(PORT,() => {
       console.log(`----Server running on http://localhost:${PORT} ----`);
     });
   } catch (err) {

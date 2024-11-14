@@ -1,8 +1,8 @@
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const PasswordReset = require("../models/utils_models/PasswordReset");
-const Users = require("../models/models.user");
-const axios = require("axios");
+// const Users = require("../models/models.user");
+// const axios = require("axios");
 
 
 
@@ -95,53 +95,48 @@ const resetPassword = async (verificationCode, userId, res) => {
   }
 };
 
-/**
- * Updates the user's password.
- * @param {string} userId - The ID of the user.
- * @param {string} newPassword - The new password.
- * @param {Object} res - The response object.
- * @returns {Object} JSON response with status and message.
- */
-const updateUserPassword = async (userId, newPassword, res) => {
-  try {
-    const user = await Users.findById(userId);
+// /**
+//  * Updates the user's password.
+//  * @param {string} userId - The ID of the user.
+//  * @param {string} newPassword - The new password.
+//  * @param {Object} res - The response object.
+//  * @returns {Object} JSON response with status and message.
+//  */
+// const updateUserPassword = async (userId, newPassword, res) => {
+//   try {
+//     const user = await Users.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
 
-    const saltRounds = 10;
-    const salt = await bcrypt.genSalt(saltRounds);
-    user.password = await bcrypt.hash(newPassword, salt);
+//     const saltRounds = 10;
+//     const salt = await bcrypt.genSalt(saltRounds);
+//     user.password = await bcrypt.hash(newPassword, salt);
 
-    await user.save();
+//     await user.save();
 
-    return res.status(200).json({ message: "Password updated successfully" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Error updating password" });
-  }
-};
+//     return res.status(200).json({ message: "Password updated successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: "Error updating password" });
+//   }
+// };
 
 /**
  * Sends an email to a specified recipient .
- * @param {string} name - The name of the recipient.
  * @param {string} recipient - The email address of the recipient.
  * @param {string} subject - The subject of the email.
  * @param {string} message - The HTML content of the email.
- * @param {Object} res - The response object.
  * @returns {Object} JSON response with status and message.
  */
-const sendEmail = async (name, recipient, subject, message, res) => {
+const sendEmail = async (recipient, subject, message,) => {
   const mailOptions = {
     from: process.env.AUTH_EMAIL,
     to: recipient,
     subject: subject,
     html: `
-    <div style="background-color: #f0f0f0; padding: 20px; border-radius: 10px; font-family: 'Arial', sans-serif; color: #333;">
-    <h2 style="color: #007BFF; font-size: 20px; margin-bottom: 15px;">Hello ${name},</h2><br>
     ${message}
-    </div>
     `,
   };
 
@@ -187,54 +182,54 @@ const sendApprovalEmail = async ( recipient, subject, message,) => {
     throw error;
   }
 };
-/**
- * Sends an sms Mesage to user .
- * @param {string} sender - The name of the organization sending.
- * @param {string} message - The HTML content of the email.
- * @param {string} recipientsPhone - The response object.
- */
+// /**
+//  * Sends an sms Mesage to user .
+//  * @param {string} sender - The name of the organization sending.
+//  * @param {string} message - The HTML content of the email.
+//  * @param {string} recipientsPhone - The response object.
+//  */
 
-const sendSMS = async (sender, message, recipientsPhone) => {
-  try {
-    // SEND SMS
-    const data = {
-      sender,
-      message,
-      recipients : [recipientsPhone],
-    };
+// const sendSMS = async (sender, message, recipientsPhone) => {
+//   try {
+//     // SEND SMS
+//     const data = {
+//       sender,
+//       message,
+//       recipients : [recipientsPhone],
+//     };
 
-    const config = {
-      method: "post",
-      url: "https://sms.arkesel.com/api/v2/sms/send",
-      headers: {
-        "api-key": process.env.ARKESEL_API,
-      },
-      data,
-    };
+//     const config = {
+//       method: "post",
+//       url: "https://sms.arkesel.com/api/v2/sms/send",
+//       headers: {
+//         "api-key": process.env.ARKESEL_API,
+//       },
+//       data,
+//     };
 
-    const response = await axios(config);
-    console.log(response.data);
-  } catch (error) {
-    if (error.response) {
-      // The request was made, and the server responded with a status code
-      // that falls out of the range of 2xx
-      console.error("SMS API Error:", error.response.data);
-      console.error("SMS API Status:", error.response.status);
-    } else if (error.request) {
-      // The request was made, but no response was received
-      console.error("SMS API Error:", error.request);
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.error("SMS API Error:", error.message);
-    }
-  }
-};
+//     const response = await axios(config);
+//     console.log(response.data);
+//   } catch (error) {
+//     if (error.response) {
+//       // The request was made, and the server responded with a status code
+//       // that falls out of the range of 2xx
+//       console.error("SMS API Error:", error.response.data);
+//       console.error("SMS API Status:", error.response.status);
+//     } else if (error.request) {
+//       // The request was made, but no response was received
+//       console.error("SMS API Error:", error.request);
+//     } else {
+//       // Something happened in setting up the request that triggered an Error
+//       console.error("SMS API Error:", error.message);
+//     }
+//   }
+// };
 
 module.exports = {
   sendResetEmail,
   resetPassword,
-  updateUserPassword,
+  // updateUserPassword,
   sendEmail,
   sendApprovalEmail,
-  sendSMS
+  // sendSMS
 };

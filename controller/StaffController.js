@@ -1,127 +1,152 @@
 const Staffs = require('../models/staffs');
 const bcrypt = require('bcrypt');
 const { validationResult } = require('express-validator');
-const {cloudinary, cleanupUploadedFile}  = require('../config/cloudinaryConfig');
+const { cloudinary, cleanupUploadedFile } = require('../config/cloudinaryConfig');
+const { sendEmail } = require('../utils/MailSender');
+const { generatStaffeWelcomeMessage } = require('../utils/messages');
+const Hospitals = require('../models/hospitals');
+const Pharmacies = require('../models/pharmacy');
 
 
 
 const staffController = {
 
-    async getstaffs(req, res){
-        try{
-            const staffs = await Staffs.find();
-            
-            res.status(200).json({success: true, message:"Staffs account data retrieved successful", staffs})
-        }catch(error){
-            console.error(error.message);
-            res.status(500).json({ success: false, message: error.message });
-        }
-    },
+  async getstaffs(req, res) {
+    try {
+      const staffs = await Staffs.find();
 
-    async getstaffsByID(req, res){
-        try{
-            const {staffId} = req.params
-            const staff = await Staffs.findById(staffId);
-            
-            if(!staff){
-                res.status(404).json({success: false, message: "Unable to find staff"})
-            }
-            
-            res.status(200).json({success: true, message:"Staff data retrieved successful", staff})
-        }catch(error){
-            console.error(error.message);
-            res.status(500).json({ success: false, message: error.message });
-        }
-    },
+      res.status(200).json({ success: true, message: "Staffs account data retrieved successful", staffs })
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
 
-    // Create new staff member with profile image
-    async createStaff(req, res) {
-      try {
-        const {
-          title,
-          firstname,
-          middlename,
-          lastname,
-          gender,
-          dob,
-          cardnumber,
-          email,
-          maritalstatuse,
-          position,
-          status,
-          contact,
-          password,
-        } = req.body;
-    
-     
-        console.log('Received form data:', req.body);
-        console.log('Received files:', req.files);
-        
-        const existingStaff = await Staffs.findOne({ email: new RegExp(`^${email}$`, 'i') });
-        if (existingStaff) {
-          return res.status(400).json({ message: 'Email already registered' });
-        }
-    
-        let profileUrl = null;
-        let publicId = null;
-        if (req.files && req.files.profile) {
-          const profileResult = await cloudinary.uploader.upload(
-            req.files.profile[0].path,
-            {
-              folder: "staff_profiles",
-            }
-          );
-          profileUrl = profileResult.secure_url;
-          publicId = profileResult.public_id;
-        }
-    
+  async getstaffsByID(req, res) {
+    try {
+      const { staffId } = req.params
+      const staff = await Staffs.findById(staffId);
 
-        const staffId = `STAFF${Date.now().toString().slice(-6)}`;
-        const hashedPassword = await bcrypt.hash(password, 12);
-    
-        const newStaff = new Staffs({
-          title,
-          firstname,
-          middlename,
-          lastname,
-          gender,
-          dob,
-          cardnumber,
-          email: email.toLowerCase(),
-          maritalstatuse,
-          staffId,
-          position,
-          status: status || 'offline',
-          contact,
-          password: hashedPassword,
-          profile: {
-            picture: profileUrl || 'https://via.placeholder.com/150',
-            publicId,
-          },
-        });
-    
-        await newStaff.save();
-    
-        const staffResponse = newStaff.toObject();
-        delete staffResponse.password;
-    
-        res.status(201).json({
-          message: 'Staff created successfully',
-          staff: staffResponse,
-        });
-      } catch (error) {
-        await cleanupUploadedFile(req, 'profile');
-
-        console.error('Create staff error:', error);
-        res.status(500).json({
-          message: 'Error creating staff member',
-          error: error.message,
-        });
+      if (!staff) {
+        res.status(404).json({ success: false, message: "Unable to find staff" })
       }
-    },
+
+      res.status(200).json({ success: true, message: "Staff data retrieved successful", staff })
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  // Create new staff member with profile image
+  async createStaff(req, res) {
+    try {
+      const { accountType, accountId } = req.session;
+      
+      
+      
+      const {
+        title,
+        firstname,
+        middlename,
+        lastname,
+        gender,
+        dob,
+        cardnumber,
+        email,
+        maritalstatuse,
+        position,
+        status,
+        contact,
+        password,
+      } = req.body;
+
+
+
+      const existingStaff = await Staffs.findOne({ email: new RegExp(`^${email}$`, 'i') });
+      if (existingStaff) {
+        return res.status(400).json({ message: 'Email already registered' });
+      }
+
+      let profileUrl = null;
+      let publicId = null;
+      if (req.files && req.files.profile) {
+        const profileResult = await cloudinary.uploader.upload(
+          req.files.profile[0].path,
+          {
+            folder: "staff_profiles",
+          }
+        );
+        profileUrl = profileResult.secure_url;
+        publicId = profileResult.public_id;
+      }
+
+
+      const staffId = `STAFF${Date.now().toString().slice(-6)}`;
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      const newStaff = new Staffs({
+        title,
+        firstname,
+        middlename,
+        lastname,
+        gender,
+        dob,
+        cardnumber,
+        email: email.toLowerCase(),
+        maritalstatuse,
+        staffId,
+        position,
+        status: status || 'offline',
+        contact,
+        password: hashedPassword,
+        profile: {
+          picture: profileUrl || 'https://via.placeholder.com/150',
+          publicId,
+        },
+      });
+
+      await newStaff.save();
+
+      const staffResponse = newStaff.toObject();
+      delete staffResponse.password;
+
+      let account = null;
+      if (accountId) {
+        account = await Hospitals.findById(accountId)
+          .populate('staffs')
+        if (!account) {
+          account = await Pharmacies.findById(accountId)
+            .populate('staffs')
+        }
+      }
+
+      account.staffs.push(newStaff._id);
+      await account.save();
+
+      const message = await generatStaffeWelcomeMessage(account, newStaff, password)
+
+
+      await sendEmail(email, 'Staff Account Registeration', message)
+
+
+      req.flash('message', `${newStaff.firstname + ' ' + newStaff.lastname}! account has been created successfully'`);
+      req.flash('status', 'success');
+
+      res.redirect(`/dashboard/${accountType}/${accountId}/staffs`)
+    } catch (error) {
+      console.log('Create staff error:', error);
+
+      req.flash('message', `Error creating staff member`);
+      req.flash('status', 'success');
+
+      res.redirect(`/dashboard/${accountType}/${Id}/staffs`)
+
+    }
+  },
 
   // Update staff profile image
-   async updateProfileImage(req, res) {
+  async updateProfileImage(req, res) {
     try {
       const staffId = req.params.id;
 
@@ -162,7 +187,7 @@ const staffController = {
   },
 
   // Update staff member (modified to handle profile image update)
-   async updateStaff(req, res) {
+  async updateStaff(req, res) {
     try {
       const staffId = req.params.id;
       const updates = req.body;
@@ -213,7 +238,7 @@ const staffController = {
   },
 
   // Delete staff member (modified to delete profile image)
-   async deleteStaff(req, res) {
+  async deleteStaff(req, res) {
     try {
       const staffId = req.params.id;
 
@@ -237,7 +262,7 @@ const staffController = {
       res.status(500).json({ message: 'Error deleting staff member', error: error.message });
     }
   }
-    
+
 
 }
 
