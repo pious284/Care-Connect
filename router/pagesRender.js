@@ -14,6 +14,7 @@ router.get('/register/pharmacy',  RenderPages.getPharmacyRegisteration)
 // dashboard pages
 router.get('/dashboard/:accountType/:Id',  RenderPages.getDashboard)
 router.get('/dashboard/:accountType/:Id/staffs',  RenderPages.getFacilityStaffs)
+router.get('/dashboard/:accountType/:Id/appointments',  RenderPages.getFacilityAppointments)
 
 
 module.exports = router

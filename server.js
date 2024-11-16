@@ -48,6 +48,7 @@ const rooms = {};
 
 io.on('connection', (socket) => {
   socket.on('join-room', (roomId, userId) => {
+    console.log('Room Id', roomId, 'User Id', userId)
       socket.join(roomId);
 
       // Get all connected clients in the room (except the new user)
