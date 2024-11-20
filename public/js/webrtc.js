@@ -136,9 +136,12 @@ async function handleUserSignal(userId, signal) {
           // Set up peer event handlers
           peer.ontrack = (event) => {
             const video = document.createElement('video');
+            video.srcObject = event.streams[0];
+            video.autoplay = true;
             video.setAttribute('data-peer-id', userId);
             addVideoStream(video, event.streams[0]);
-          };
+        };
+        
     
           // Add local stream tracks
           localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
