@@ -129,49 +129,38 @@ async function handleUserSignal(userId, signal) {
     try {
         let peer = peers[userId];
 
-        // Create peer if it doesn't exist
         if (!peer) {
-            peer = new RTCPeerConnection(configuration);
-            peers[userId] = peer;
-
-            // Set up peer event handlers
-            peer.ontrack = (event) => {
-                const video = document.createElement('video');
-                video.setAttribute('data-peer-id', userId);
-                addVideoStream(video, event.streams[0]);
-            };
-
-            // Add local stream tracks
-            localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+          peer = new RTCPeerConnection(configuration);
+          peers[userId] = peer;
+    
+          // Set up peer event handlers
+          peer.ontrack = (event) => {
+            const video = document.createElement('video');
+            video.setAttribute('data-peer-id', userId);
+            addVideoStream(video, event.streams[0]);
+          };
+    
+          // Add local stream tracks
+          localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
         }
-
-        if (!peer) return;
-
-        console.log(`Current peer state for ${userId}: ${peer.signalingState}`);
-
-        // More aggressive state reset
+    
+        // Check if the peer connection is in a non-stable state
         if (peer.signalingState !== 'stable') {
-            try {
-                await peer.setLocalDescription(null);
-                await peer.close();
-                delete peers[userId];
-                
-                // Recreate peer connection
-                peer = new RTCPeerConnection(configuration);
-                peers[userId] = peer;
-
-                // Reattach tracks and event handlers
-                localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
-                peer.ontrack = (event) => {
-                    const video = document.createElement('video');
-                    video.setAttribute('data-peer-id', userId);
-                    addVideoStream(video, event.streams[0]);
-                };
-            } catch (resetError) {
-                console.error('Error resetting peer connection:', resetError);
-                return;
-            }
+          // Reset the peer connection
+          await peer.close();
+          delete peers[userId];
+          peer = new RTCPeerConnection(configuration);
+          peers[userId] = peer;
+    
+          // Reattach tracks and event handlers
+          localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+          peer.ontrack = (event) => {
+            const video = document.createElement('video');
+            video.setAttribute('data-peer-id', userId);
+            addVideoStream(video, event.streams[0]);
+          };
         }
+    
 
         switch (signal.type) {
             case 'offer':
@@ -207,13 +196,14 @@ async function handleUserSignal(userId, signal) {
         
         // Additional cleanup
         if (peers[userId]) {
-            try {
-                peers[userId].close();
-                delete peers[userId];
-            } catch (cleanupError) {
-                console.error('Error during peer cleanup:', cleanupError);
-            }
+          try {
+            peers[userId].close();
+            delete peers[userId];
+          } catch (cleanupError) {
+            console.error('Error during peer cleanup:', cleanupError);
+          }
         }
+        removeUserVideo(userId);
     }
 }
 
