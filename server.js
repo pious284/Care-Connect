@@ -53,32 +53,44 @@ const rooms = {};
 
 io.on('connection', (socket) => {
   socket.on('join-room', (roomId, userId) => {
-    console.log('Room Id', roomId, 'User Id', userId)
-      socket.join(roomId);
+    console.log('Room Id', roomId, 'User Id', userId);
+    socket.join(roomId);
 
-      // Get all connected clients in the room (except the new user)
-      const existingUsers = [...io.sockets.adapter.rooms.get(roomId) || []].filter(id => id !== socket.id);
+    // Store user ID on the socket for later use
+    socket.userId = userId;
 
-      // Send existing users to the newly joined user
-      socket.emit('existing-users', existingUsers);
+    // Get all connected clients in the room (except the new user)
+    const existingUsers = [...io.sockets.adapter.rooms.get(roomId) || []].filter(
+      socketId => socketId !== socket.id
+    );
 
-      // Notify others in the room about the new user
-      socket.to(roomId).emit('user-connected', userId);
+    // Send existing users to the newly joined user
+    socket.emit('existing-users', existingUsers);
 
-      // Handle user disconnect
-      socket.on('disconnect', () => {
-          socket.to(roomId).emit('user-disconnected', userId);
+    // Notify others in the room about the new user
+    socket.to(roomId).emit('user-connected', userId);
+
+    // Handle signaling
+    socket.on('signal', (data) => {
+      // Broadcast signal with the correct user ID
+      socket.to(roomId).emit('user-signal', { 
+        userId: userId, 
+        signal: data.signal 
       });
+    });
 
-      socket.on('signal', (data) => {
-        socket.to(roomId).emit('user-signal', { 
-          userId: socket.id, 
-          signal: data.signal 
-        });
-      });
+    // Handle user disconnect
+    socket.on('disconnect', () => {
+      socket.to(roomId).emit('user-disconnected', userId);
+    });
+
+    // Optional: Handle explicit room leave
+    socket.on('leave-room', () => {
+      socket.to(roomId).emit('user-disconnected', userId);
+      socket.leave(roomId);
+    });
   });
 });
-
 // Session configuration
 const sessionConfig = {
   secret: 'Secret_Key',
