@@ -34,50 +34,48 @@ const AppointmentRouter = require('./router/appointment')
 const notFoundHandler = require('./handlers/404');
 const { validationErrorHandler, errorHandler } = require('./handlers/400');
 
-const http = require('http');
-const { Server } = require('socket.io');
-const { RTCPeerConnection, RTCSessionDescription } = require('wrtc');
+
 // Initialize express app
 const app = express();
 
 // Initialize socket Server  
-const server = http.createServer(app);
-const io = new Server(server);
 
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 // Socket.io connection handling
-let peers = {};
+const rooms = {};
 
-io.on('connection', socket => {
-  console.log('A user connected:', socket.id);
+io.on('connection', (socket) => {
+  socket.on('join-room', (roomId, userId) => {
+    console.log('Room Id', roomId, 'User Id', userId)
+      socket.join(roomId);
 
-  const peer = new RTCPeerConnection();
-  peers[socket.id] = peer;
+      // Get all connected clients in the room (except the new user)
+      const existingUsers = [...io.sockets.adapter.rooms.get(roomId) || []].filter(id => id !== socket.id);
 
-  peer.onicecandidate = event => {
-    if (event.candidate) {
-      socket.emit('candidate', socket.id, event.candidate);
-    }
-  };
+      // Send existing users to the newly joined user
+      socket.emit('existing-users', existingUsers);
 
-  socket.on('offer', async (id, description) => {
-    await peer.setRemoteDescription(new RTCSessionDescription(description));
-    const answer = await peer.createAnswer();
-    await peer.setLocalDescription(answer);
-    socket.emit('answer', id, peer.localDescription);
-  });
+      // Notify others in the room about the new user
+      socket.to(roomId).emit('user-connected', userId);
 
-  socket.on('answer', async (id, description) => {
-    await peer.setRemoteDescription(new RTCSessionDescription(description));
-  });
+      // Handle user disconnect
+      socket.on('disconnect', () => {
+          socket.to(roomId).emit('user-disconnected', userId);
+      });
 
-  socket.on('candidate', async (id, candidate) => {
-    await peer.addIceCandidate(new RTCIceCandidate(candidate));
-  });
-
-  socket.on('disconnect', () => {
-    delete peers[socket.id];
-    console.log('A user disconnected:', socket.id);
+      socket.on('signal', (data) => {
+        socket.to(roomId).emit('user-signal', { 
+          userId: socket.id, 
+          signal: data.signal 
+        });
+      });
   });
 });
 
@@ -146,7 +144,7 @@ app.use(errorHandler);
 async function startServer() {
   const PORT = process.env.PORT || 8080;
   try {
-    app.listen(PORT,() => {
+    server.listen(PORT,() => {
       console.log(`----Server running on http://localhost:${PORT} ----`);
     });
   } catch (err) {

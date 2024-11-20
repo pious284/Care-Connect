@@ -1,5 +1,5 @@
-const socket = io('/');
-const videoGrid = document.getElementById('video-grid');
+const socket = io();
+let videoGrid; // Declare outside to ensure global scope
 const localVideo = document.createElement('video');
 localVideo.muted = true; // Mute local video to avoid feedback
 
@@ -21,10 +21,32 @@ let isAudioEnabled = true;
 let isVideoEnabled = true;
 let isScreenSharing = false;
 
+// Ensure DOM is loaded before initializing
+document.addEventListener('DOMContentLoaded', () => {
+    videoGrid = document.getElementById('video-grid');
+    if (!videoGrid) {
+        console.error('Video grid element not found. Check your HTML.');
+        return;
+    }
+
+    // Initialize media stream on load
+    setupMediaStream();
+});
+
 // Get user media
 async function setupMediaStream() {
     try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480 },
+            audio: true
+        });
+
+        // Set video attributes for local stream
+        localVideo.srcObject = localStream;
+        localVideo.setAttribute('data-peer-id', 'local');
+        localVideo.muted = true;
+
+        // Add local video to grid
         addVideoStream(localVideo, localStream);
 
         localPeerId = generateUserId(); // Store local user ID
@@ -47,84 +69,78 @@ async function setupMediaStream() {
                 console.error('Error handling user signal:', error);
             }
         });
+
+        socket.on('user-disconnected', (userId) => {
+            removeUserVideo(userId);
+        });
+
     } catch (error) {
         console.error('Error accessing media devices:', error);
-        // Add user feedback for media access errors
         alert('Unable to access camera or microphone. Please check your permissions.');
     }
 }
+
 function connectToNewUser(userId, stream) {
     if (peers[userId]) {
         console.log('Peer connection already exists for:', userId);
         return;
     }
 
-    console.log('Creating new peer connection for:', userId);
     const peer = new RTCPeerConnection(configuration);
     peers[userId] = peer;
 
-    // Add connection state logging
-    peer.onconnectionstatechange = () => {
-        console.log(`Connection state for peer ${userId}:`, peer.connectionState);
-    };
-
-    peer.oniceconnectionstatechange = () => {
-        console.log(`ICE connection state for peer ${userId}:`, peer.iceConnectionState);
-    };
-
-    stream.getTracks().forEach((track) => {
-        console.log('Adding track to peer:', track.kind);
+    stream.getTracks().forEach(track => {
         peer.addTrack(track, stream);
     });
 
-    // Improved error handling for peer connection
-    try {
-        peer.onicecandidate = (event) => {
-            if (event.candidate) {
-                socket.emit('signal', {
-                    userId: userId,
-                    signal: { type: 'ice-candidate', candidate: event.candidate }
-                });
-            }
-        };
+    peer.onicecandidate = (event) => {
+        if (event.candidate) {
+            socket.emit('signal', {
+                userId: userId,
+                signal: {
+                    type: 'ice-candidate',
+                    candidate: event.candidate
+                }
+            });
+        }
+    };
 
-        peer.ontrack = (event) => {
-            console.log('Received remote track:', event.track.kind);
-            const video = document.createElement('video');
-            video.setAttribute('data-peer-id', userId);
-            addVideoStream(video, event.streams[0]);
-        };
+    peer.ontrack = (event) => {
+        const video = document.createElement('video');
+        video.setAttribute('data-peer-id', userId);
+        addVideoStream(video, event.streams[0]);
+    };
 
-        // Create and send offer with error handling
-        peer.createOffer()
-            .then(offer => peer.setLocalDescription(offer))
-            .then(() => {
-                socket.emit('signal', {
-                    userId: userId,
-                    signal: { type: 'offer', sdp: peer.localDescription }
-                });
-            })
-            .catch(error => console.error('Error creating offer:', error));
-    } catch (error) {
-        console.error('Error in peer connection setup:', error);
-    }
+    peer.createOffer()
+        .then(offer => peer.setLocalDescription(offer))
+        .then(() => {
+            socket.emit('signal', {
+                userId: userId,
+                signal: {
+                    type: 'offer',
+                    sdp: peer.localDescription
+                }
+            });
+        })
+        .catch(error => console.error('Offer creation error:', error));
 }
+
 async function handleUserSignal(userId, signal) {
     try {
         let peer = peers[userId];
-        
+
         // Create peer if it doesn't exist and we receive an offer
         if (!peer && signal.type === 'offer') {
             peer = new RTCPeerConnection(configuration);
             peers[userId] = peer;
-            
+
             // Set up peer event handlers
             peer.ontrack = (event) => {
                 const video = document.createElement('video');
                 video.setAttribute('data-peer-id', userId);
                 addVideoStream(video, event.streams[0]);
             };
-            
+
             // Add local stream
             localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
         }
@@ -141,11 +157,11 @@ async function handleUserSignal(userId, signal) {
                     signal: { type: 'answer', sdp: answer }
                 });
                 break;
-                
+
             case 'answer':
                 await peer.setRemoteDescription(new RTCSessionDescription(signal.sdp));
                 break;
-                
+
             case 'ice-candidate':
                 if (peer.remoteDescription) {
                     await peer.addIceCandidate(new RTCIceCandidate(signal.candidate));
@@ -158,8 +174,8 @@ async function handleUserSignal(userId, signal) {
 }
 
 function addVideoStream(video, stream) {
-    if (!stream) {
-        console.error('No stream provided to addVideoStream');
+    if (!videoGrid || !stream) {
+        console.error('Video grid or stream is missing');
         return;
     }
 
@@ -170,12 +186,14 @@ function addVideoStream(video, stream) {
                 console.error('Error playing video:', error);
             });
         });
-        
-        // Add error handling for video playback
+
+        video.setAttribute('autoplay', true);
+        video.setAttribute('playsinline', true);
+
         video.onerror = (error) => {
             console.error('Video error:', error);
         };
-        
+
         videoGrid.appendChild(video);
         updateParticipantCount();
     } catch (error) {
@@ -183,6 +201,16 @@ function addVideoStream(video, stream) {
     }
 }
 
+function removeUserVideo(userId) {
+    const videoToRemove = document.querySelector(`[data-peer-id="${userId}"]`);
+    if (videoToRemove) {
+        videoGrid.removeChild(videoToRemove);
+        delete peers[userId];
+        updateParticipantCount();
+    }
+}
+
+// Existing toggle and utility functions remain the same...
 function toggleAudio() {
     isAudioEnabled = !isAudioEnabled;
     localStream.getAudioTracks().forEach((track) => (track.enabled = isAudioEnabled));
@@ -230,7 +258,10 @@ function generateUserId() {
 }
 
 function updateParticipantCount(count = Object.keys(peers).length + 1) {
-    document.getElementById('participantCount').innerText = `${count} Participants`;
+    const participantElement = document.getElementById('participantCount');
+    if (participantElement) {
+        participantElement.innerText = `${count} Participants`;
+    }
 }
 
 function updateButtons() {
@@ -238,6 +269,4 @@ function updateButtons() {
     document.getElementById('videoBtn').classList.toggle('btn-danger', !isVideoEnabled);
     document.getElementById('screenBtn').classList.toggle('btn-danger', isScreenSharing);
 }
-
-// Initialize media stream on load
 setupMediaStream();
