@@ -129,7 +129,7 @@ async function handleUserSignal(userId, signal) {
     try {
         let peer = peers[userId];
 
-        // Create peer if it doesn't exist and we receive an offer
+        // Create peer if it doesn't exist
         if (!peer) {
             peer = new RTCPeerConnection(configuration);
             peers[userId] = peer;
@@ -147,9 +147,30 @@ async function handleUserSignal(userId, signal) {
 
         if (!peer) return;
 
-        // Reset connection state if needed
+        console.log(`Current peer state for ${userId}: ${peer.signalingState}`);
+
+        // More aggressive state reset
         if (peer.signalingState !== 'stable') {
-            await peer.setLocalDescription(null);
+            try {
+                await peer.setLocalDescription(null);
+                await peer.close();
+                delete peers[userId];
+                
+                // Recreate peer connection
+                peer = new RTCPeerConnection(configuration);
+                peers[userId] = peer;
+
+                // Reattach tracks and event handlers
+                localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+                peer.ontrack = (event) => {
+                    const video = document.createElement('video');
+                    video.setAttribute('data-peer-id', userId);
+                    addVideoStream(video, event.streams[0]);
+                };
+            } catch (resetError) {
+                console.error('Error resetting peer connection:', resetError);
+                return;
+            }
         }
 
         switch (signal.type) {
@@ -173,20 +194,28 @@ async function handleUserSignal(userId, signal) {
                 if (peer.remoteDescription) {
                     try {
                         await peer.addIceCandidate(new RTCIceCandidate(signal.candidate));
-                    } catch (error) {
-                        console.warn('Error adding ICE candidate:', error);
+                    } catch (icError) {
+                        console.warn('Error adding ICE candidate:', icError);
                     }
                 }
                 break;
         }
 
-        // Add more detailed logging
-        console.log(`Signal processed for user ${userId}. Current state: ${peer.signalingState}`);
+        console.log(`Signal processed for user ${userId}. Final state: ${peer.signalingState}`);
     } catch (error) {
-        console.error(`Detailed error handling signal from ${userId}:`, error);
+        console.error(`Critical error handling signal from ${userId}:`, error);
+        
+        // Additional cleanup
+        if (peers[userId]) {
+            try {
+                peers[userId].close();
+                delete peers[userId];
+            } catch (cleanupError) {
+                console.error('Error during peer cleanup:', cleanupError);
+            }
+        }
     }
 }
-
 
 function addVideoStream(video, stream) {
     if (!videoGrid || !stream) {
