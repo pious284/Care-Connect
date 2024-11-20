@@ -130,7 +130,7 @@ async function handleUserSignal(userId, signal) {
         let peer = peers[userId];
 
         // Create peer if it doesn't exist and we receive an offer
-        if (!peer && signal.type === 'offer') {
+        if (!peer) {
             peer = new RTCPeerConnection(configuration);
             peers[userId] = peer;
 
@@ -141,11 +141,16 @@ async function handleUserSignal(userId, signal) {
                 addVideoStream(video, event.streams[0]);
             };
 
-            // Add local stream
+            // Add local stream tracks
             localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
         }
 
         if (!peer) return;
+
+        // Reset connection state if needed
+        if (peer.signalingState !== 'stable') {
+            await peer.setLocalDescription(null);
+        }
 
         switch (signal.type) {
             case 'offer':
@@ -159,19 +164,29 @@ async function handleUserSignal(userId, signal) {
                 break;
 
             case 'answer':
-                await peer.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+                if (peer.signalingState === 'have-local-offer') {
+                    await peer.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+                }
                 break;
 
             case 'ice-candidate':
                 if (peer.remoteDescription) {
-                    await peer.addIceCandidate(new RTCIceCandidate(signal.candidate));
+                    try {
+                        await peer.addIceCandidate(new RTCIceCandidate(signal.candidate));
+                    } catch (error) {
+                        console.warn('Error adding ICE candidate:', error);
+                    }
                 }
                 break;
         }
+
+        // Add more detailed logging
+        console.log(`Signal processed for user ${userId}. Current state: ${peer.signalingState}`);
     } catch (error) {
-        console.error('Error handling signal:', error);
+        console.error(`Detailed error handling signal from ${userId}:`, error);
     }
 }
+
 
 function addVideoStream(video, stream) {
     if (!videoGrid || !stream) {
