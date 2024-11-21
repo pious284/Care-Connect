@@ -55,9 +55,9 @@
 <script>
     // In your JavaScript file
     const ctx = document.getElementById('hospitalMetricsChart').getContext('2d');
-    const StaffsLength = <%= account.staffs.length %> || 0;
-    const Reviewslength = <%= account.reviews.length %> || 0;
-    const Appointmentslength = <%= account.staffs.length %> || 0;
+    const StaffsLength = parseInt('<%= account.staffs.length %>') || 0;
+    const Reviewslength =  parseInt('<%= account.reviews.length %>') || 0;
+    const Appointmentslength =  parseInt('<%= account.reviews.length %>')  || 0;
    
     const data = [
         { metric: 'Appointments', value: Appointmentslength },

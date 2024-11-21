@@ -82,6 +82,12 @@ const HospitalSchema = new mongoose.Schema({
             ref: "Reviews"
         }
     ],
+    appointments:[
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Appointments'
+        }
+    ],
     isOwner:{
         type: Boolean,
         default: false

@@ -99,6 +99,8 @@ const staffController = {
         position,
         status: status || 'offline',
         contact,
+        facilityId: accountId,
+        facilityType: accountType,
         password: hashedPassword,
         profile: {
           picture: profileUrl || 'https://via.placeholder.com/150',

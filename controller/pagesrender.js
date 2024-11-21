@@ -13,7 +13,7 @@ const RenderPages = {
         const alert = { message: alertMessage, status: alertStatus };
 
         try {
-            const hospitals = await Hospitals.find({subscriptionstatus: true}).populate({
+            const hospitals = await Hospitals.find({ subscriptionstatus: true }).populate({
                 path: 'staffs',
                 match: { status: { $regex: '^Active$', $options: 'i' } },
                 options: {
@@ -72,8 +72,12 @@ const RenderPages = {
     },
     async getRegisteration(req, res) {
         try {
+            const alertMessage = req.flash("message");
+            const alertStatus = req.flash("status");
 
-            res.render('./Home/registeration')
+            const alert = { message: alertMessage, status: alertStatus };
+
+            res.render('./Home/registeration', { alert })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
@@ -81,8 +85,12 @@ const RenderPages = {
     },
     async getHospitalRegisteration(req, res) {
         try {
+            const alertMessage = req.flash("message");
+            const alertStatus = req.flash("status");
 
-            res.render('./Home/registerHospital')
+            const alert = { message: alertMessage, status: alertStatus };
+
+            res.render('./Home/registerHospital', { alert })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
@@ -90,8 +98,12 @@ const RenderPages = {
     },
     async getPharmacyRegisteration(req, res) {
         try {
+            const alertMessage = req.flash("message");
+            const alertStatus = req.flash("status");
 
-            res.render('./Home/registerPharmacy')
+            const alert = { message: alertMessage, status: alertStatus };
+
+            res.render('./Home/registerPharmacy', { alert })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
@@ -110,19 +122,25 @@ const RenderPages = {
             if (Id) {
                 account = await Hospitals.findById(Id)
                     .populate('staffs')
+                    .populate('appointments')
                 if (!account) {
                     account = await Pharmacies.findById(Id)
                         .populate('staffs')
+                        .populate('appointments')
                     if (!account) {
                         account = await staffs.findById(Id)
+                            .populate({
+                                path: 'facilityId'
+                            })
                         if (!account) {
                             account = await patients.findById(Id)
-
                         }
                     }
                 }
             }
-            res.render('./Dashboard/dashboard', { account, accountType, alert})
+
+            console.log("account", account)
+            res.render('./Dashboard/dashboard', { account, accountType, alert })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
@@ -158,7 +176,7 @@ const RenderPages = {
             }
             const facilitystaffs = account.staffs;
             // console.log(facilitystaffs)
-            res.render('./Dashboard/staffs', {account ,staffs:facilitystaffs, accountType, alert})
+            res.render('./Dashboard/staffs', { account, staffs: facilitystaffs, accountType, alert })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
@@ -173,7 +191,7 @@ const RenderPages = {
 
             const { Id, accountType } = req.params;
 
-            const appointments = await Appointments.find({facility: Id}).sort({isAttended: 1})
+            const appointments = await Appointments.find({ facility: Id }).sort({ isAttended: 1 })
 
             let account = null;
             if (Id) {
@@ -195,7 +213,7 @@ const RenderPages = {
                 }
             }
 
-            res.render('./Dashboard/appointments', {account ,appointments, accountType, alert})
+            res.render('./Dashboard/appointments', { account, appointments, accountType, alert })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });

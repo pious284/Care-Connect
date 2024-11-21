@@ -59,10 +59,16 @@ const StaffsSchema = new mongoose.Schema(
       type: String,
       enum: ["active", "onleave", "offline"],
     },
-    // facility:{
-    //   type: mongoose.Schema.ObjectId,
-    //   ref: ''
-    // },
+    facilityId: {
+      type: mongoose.Schema.ObjectId,
+      required: true,
+      refPath: 'facilityType', // Dynamic reference
+    },
+    facilityType: {
+      type: String,
+      required: true,
+      enum: ['pharmacies', 'hospitals'], // Must match one of these models
+    },
     contact: {
       type: String,
       trim: true,

@@ -16,8 +16,10 @@ const hospitalController = {
             const { name, username, email, contact, ambulancecontact, address, walletnumber, walletname, bio, password } = req.body;
             const existingHospital = await Hospitals.find({ email: new RegExp(`^${email}$`, 'i') });
 
-            if (existingHospital.length > 0) {  // Changed condition to check length
-                return res.status(400).json({ message: 'Email already registered With Another Hospital' });
+            if (existingHospital.length > 0) {
+                req.flash('message', `Email already registered With Another Hospital`);
+                req.flash('status', 'danger');
+                res.redirect('/register/hospital')
             }
 
             let logoUrl = null;
@@ -71,10 +73,8 @@ const hospitalController = {
 
         } catch (error) {
             console.error('Hospital registration error:', error);
-            return res.status(500).json({
-                success: false,
-                message: "An error occurred during registration. Please try again."
-            });
+            req.flash('message', `An error occurred during registration. Please try again.`);
+            req.flash('status', 'danger');
         }
     },
     async login(req, res) {
