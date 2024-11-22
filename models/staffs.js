@@ -62,7 +62,7 @@ const StaffsSchema = new mongoose.Schema(
     facilityId: {
       type: mongoose.Schema.ObjectId,
       required: true,
-      refPath: 'facilityType', // Dynamic reference
+      refPath: 'facilityType', 
     },
     facilityType: {
       type: String,

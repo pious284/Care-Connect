@@ -43,7 +43,7 @@ const staffController = {
     try {
       const { accountType, accountId } = req.session;
       
-      
+        console.log('session', req.session)
       
       const {
         title,

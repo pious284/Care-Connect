@@ -82,9 +82,9 @@ const hospitalController = {
             const { accountType, email, password } = req.body;
 
             let account = null;
-            if (accountType === 'hospital') {
+            if (accountType === 'hospitals') {
                 account = await Hospitals.findOne({ email });
-            } else if (accountType === 'pharmacy') {
+            } else if (accountType === 'pharmacies') {
                 account = await Pharmacies.findOne({ email });
             } else if (accountType === 'staff') {
                 account = await staffs.findOne({ email });
@@ -121,8 +121,8 @@ const hospitalController = {
 
 
             const redirectMap = {
-                'hospital': `/dashboard/${accountType}/${account._id}`,
-                'pharmacy': `/dashboard/${accountType}/${account._id}`,
+                'hospitals': `/dashboard/${accountType}/${account._id}`,
+                'pharmacies': `/dashboard/${accountType}/${account._id}`,
                 'staff': `/dashboard/${accountType}/${account._id}`,
                 'patient': `/dashboard/${accountType}/${account._id}`
             };

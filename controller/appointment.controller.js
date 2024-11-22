@@ -68,6 +68,9 @@ const AppointmentController = {
 
             newAppointment.save();
 
+             facility.appointments.push(newAppointment._id)
+             await facility.save();
+             
             const appointmentmessage = await generateAppointmentEmail(newAppointment, facility)
             const facilityappointmentmessage = await generateFacilityAppointmentEmail(newAppointment, facility)
 

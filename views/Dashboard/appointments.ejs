@@ -44,7 +44,7 @@
                                 <tbody>
                                     <% if (appointments && appointments.length > 0) { %>
                                         <% appointments.forEach((appointment, index) => { %>
-                                            <tr style="background-color:<%= appointment.isAttended ? 'rgba(25, 135, 84, 0.1)' : 'rgba(220, 53, 69, 0.1)' %>">
+                                            <tr style=`background-color:<%= appointment.isAttended ? 'rgba(25, 135, 84, 0.1)' : 'rgba(220, 53, 69, 0.1)' %>`>
                                                 <td data-label="#">
                                                     <%= index + 1 %>
                                                 </td>

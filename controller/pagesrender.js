@@ -1,8 +1,9 @@
 const Appointments = require("../models/appointments");
 const Hospitals = require("../models/hospitals");
-const patients = require("../models/patients");
+const Patients = require("../models/patients");
 const Pharmacies = require("../models/pharmacy");
 const staffs = require("../models/staffs");
+const { calculateAge } = require("../utils/codesGen");
 
 
 const RenderPages = {
@@ -76,8 +77,14 @@ const RenderPages = {
             const alertStatus = req.flash("status");
 
             const alert = { message: alertMessage, status: alertStatus };
-
-            res.render('./Home/registeration', { alert })
+            const hospitals = await Hospitals.find({ subscriptionstatus: true }).populate({
+                path: 'staffs',
+                match: { status: { $regex: '^Active$', $options: 'i' } },
+                options: {
+                    sort: { position: -1 },
+                }
+            })
+            res.render('./Home/registeration', { alert, hospitals })
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ success: false, message: error.message });
@@ -123,6 +130,7 @@ const RenderPages = {
                 account = await Hospitals.findById(Id)
                     .populate('staffs')
                     .populate('appointments')
+                    .populate('patients')
                 if (!account) {
                     account = await Pharmacies.findById(Id)
                         .populate('staffs')
@@ -133,7 +141,7 @@ const RenderPages = {
                                 path: 'facilityId'
                             })
                         if (!account) {
-                            account = await patients.findById(Id)
+                            account = await Patients.findById(Id)
                         }
                     }
                 }
@@ -219,6 +227,56 @@ const RenderPages = {
             res.status(500).json({ success: false, message: error.message });
         }
     },
+    async getAllPatients(req, res) {
+        const alertMessage = req.flash("message");
+        const alertStatus = req.flash("status");
+
+        const alert = { message: alertMessage, status: alertStatus };
+
+        const { Id, accountType } = req.params;
+
+        const hospitals = await Hospitals.find({ subscriptionstatus: true }).populate({
+            path: 'staffs',
+            match: { status: { $regex: '^Active$', $options: 'i' } },
+            options: {
+                sort: { position: -1 },
+            }
+        })
+        const hospital = await Hospitals.findById(Id)
+            .populate({
+                path: 'patients',
+            });
+
+            res.render('./Dashboard/patients', {account:hospital,  hospitals,patients: hospital.patients,  count: hospital.patients.length,alert, accountType})
+    },
+        // Get patient details
+   async getPatient(req, res) {
+    const { Id, accountType, patientId } = req.params;
+    const alertMessage = req.flash("message");
+    const alertStatus = req.flash("status");
+
+    const alert = { message: alertMessage, status: alertStatus };
+
+    const patient = await Patients.findById(patientId)
+        .populate('medicalRecords')
+        .populate('registeredHospitals.hospital',);
+
+    if (!patient.registeredHospitals.some(reg => reg.hospital._id.toString() === Id)) {
+        console.log('Patient not found in this hospital');
+    }
+    let account = null;
+    if (Id) {
+        account = await Hospitals.findById(Id)
+            .populate('staffs')
+            .populate('appointments')
+            .populate('patients')
+    }
+
+
+    res.render('./Dashboard/patientdetail', {account,  alert, accountType, patient, calculateAge:calculateAge})
+
+},
+
 }
 
 module.exports = RenderPages;

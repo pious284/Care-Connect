@@ -88,6 +88,12 @@ const HospitalSchema = new mongoose.Schema({
             ref: 'Appointments'
         }
     ],
+    patients:[
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Patient'
+        }
+    ],
     isOwner:{
         type: Boolean,
         default: false

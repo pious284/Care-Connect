@@ -228,7 +228,14 @@
     .megacard {
       width: calc(65% - 1rem);
       flex-grow: 1;
-    }
+  }
+  
+  .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+  }
+  
   /* Mobile Styles */
   @media screen and (max-width: 768px) {
     .sidebar {
@@ -293,9 +300,8 @@
     }
   
     .megacard {
-      /* overflow-x: scroll; */
-      width: 50%;
-    }
+      width: 100%;
+  }
     .contentwrapper{
       width: 100%;
     }
