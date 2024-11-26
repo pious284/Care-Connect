@@ -38,7 +38,7 @@ const AppointmentSchema = new mongoose.Schema({
     },
     facility:{
         type: mongoose.Schema.ObjectId,
-        ref: 'hospitals'
+        ref: 'Hospitals'
     }
 });
 

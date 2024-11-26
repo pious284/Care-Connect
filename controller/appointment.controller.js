@@ -7,23 +7,24 @@ const { generateAppointmentEmail, generateFacilityAppointmentEmail } = require("
 const AppointmentController = {
     async getmeeting(req, res)  {
         const {roomId} = req.params
-        let facility;
        
-        const appointment = await Appointments.findById(roomId);
-        
-        if(appointment.facility){
-            facility = await Hospitals.findById(appointment.facility);
-            if(!facility){
-                facility = await Pharmacies.findById(appointment.facility)
-            }
-         }
+        const appointment = await Appointments.findById(roomId).populate('facility');
+        console.log(appointment)
+        let facility = appointment.facility;
+
+        // if(appointment.facility){
+        //     facility = await Hospitals.findById(appointment.facility);
+        //     if(!facility){
+        //         facility = await Pharmacies.findById(appointment.facility)
+        //     }
+        //  }
 
          if(!facility){
             req.flash('message', `Unable to book appointment because facility cant be found`);
             req.flash('status', 'danger');
             res.redirect('/')
          }
-
+         console.log('Facility', facility)
 
         const meeting =
         {
